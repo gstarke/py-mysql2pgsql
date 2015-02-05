@@ -80,7 +80,7 @@ class MysqlReader(object):
     class Table(object):
         def __init__(self, reader, name):
             self.reader = reader
-            self._name = name
+            self._name = name.lower()
             self._indexes = []
             self._foreign_keys = []
             self._triggers = []
@@ -136,7 +136,7 @@ class MysqlReader(object):
                 comment = res[8]
                 field_type = self._convert_type(res[1])
                 desc = {
-                    'name': name,
+                    'name': name.lower(),
                     'table_name': self.name,
                     'type': field_type,
                     'length': int(length) if length else None,
@@ -181,14 +181,14 @@ class MysqlReader(object):
                 match_data = re_key_2.search(line)
                 if match_data:
                     index['name'] = match_data.group(1)
-                    index['columns'] = [re.search(r'`(\w+)`', col).group(1) for col in match_data.group(2).split(',')]
+                    index['columns'] = [re.search(r'`(\w+)`', col).group(1).lower() for col in match_data.group(2).split(',')]
                     index['unique'] = 'UNIQUE' in line
                     self._indexes.append(index)
                     continue
                 match_data = re_key_3.search(line)
                 if match_data:
                     index['primary'] = True
-                    index['columns'] = [re.sub(r'\(\d+\)', '', col.replace('`', '')) for col in match_data.group(1).split(',')]
+                    index['columns'] = [re.sub(r'\(\d+\)', '', col.replace('`', '')).lower() for col in match_data.group(1).split(',')]
                     self._indexes.append(index)
                     continue
 
